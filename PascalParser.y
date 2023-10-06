@@ -25,6 +25,7 @@ import PascaLex
   '=' {TK _ EQU}
   '(' {TK _ LPAR}
   ')' {TK _ RPAR}
+  '<' {TK _ SM}
   mod {TK _ MOD}
   and {TK _ AND}
   or {TK _ OR}
@@ -69,6 +70,7 @@ BoolExpr : true {"\tPUSH\t" ++ "1" ++ "\n"}
 | false {"\tPUSH\t" ++ "0" ++ "\n"}
 | BoolExpr and BoolExpr {$1 ++ $3 ++ "\tAND\n"}
 | BoolExpr or BoolExpr {$1 ++ $3 ++ "\tOR\n"}
+| ArExpr '<' ArExpr {% smaller_than $1 $3}
 
 ArExpr: integer {"\tPUSH\t" ++ (show $1) ++ "\n"}
 | var {"\tPUSH\t" ++ $1 ++ "\n" ++ "\tLOAD\n"}
@@ -138,6 +140,21 @@ while_do cond linst = do
     linst ++
     "\tPUSH\t" ++ while_name ++ "\n\tGOTO\n" ++
     endwhile_name ++ "\tEQU\t*\n")
+
+smaller_than :: String -> String -> ParseResult String
+smaller_than a b = do
+  s <- get
+  let smaller_name =  "smaller" ++ show (counter s)
+  let endsmaller_name = "endsmaller" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return (
+    b ++ a ++ "\tSUB\n" ++
+    "\tBGZ\t" ++ smaller_name ++ "\n" ++
+    "\tPUSH\t0\n\tPUSH\t" ++ endsmaller_name ++ "\n\tGOTO\n" ++
+    smaller_name ++ "\tEQU\t*\n" ++
+    "\tPUSH\t1\n" ++
+    endsmaller_name ++ "\tEQU\t*\n")
 
 incrCounter :: Etat -> Etat
 incrCounter s = Etat {counter = (counter s) + 1}

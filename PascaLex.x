@@ -18,6 +18,7 @@ tokens :-
   <0> \= {\p _ -> TK p EQU}
   <0> \( {\p _ -> TK p LPAR}
   <0> \) {\p _ -> TK p RPAR}
+  <0> \< {\p _ -> TK p SM}
   <0> \&\& {\p _ -> TK p AND}
   <0> \|\| {\p _ -> TK p OR}
   <0> \! {\p _ -> TK p NOT}
@@ -48,6 +49,7 @@ data TokenName
   | EQU
   | LPAR
   | RPAR
+  | SM
   | AND
   | OR
   | NOT

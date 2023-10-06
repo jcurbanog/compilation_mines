@@ -1,5 +1,11 @@
 let x;
-x = input();
+print -1*3;
+print 5 mod 3;
+print 20 mod 3;
+print 74 mod 7;
+print 80 mod 20;
+print 80 mod 21;
+x = -(input());
 if x
 print x;
 else

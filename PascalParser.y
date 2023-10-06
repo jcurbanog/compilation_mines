@@ -25,6 +25,7 @@ import PascaLex
   '=' {TK _ EQU}
   '(' {TK _ LPAR}
   ')' {TK _ RPAR}
+  mod {TK _ MOD}
   and {TK _ AND}
   or {TK _ OR}
   not {TK _ NOT}
@@ -75,6 +76,8 @@ ArExpr: integer {"\tPUSH\t" ++ (show $1) ++ "\n"}
 | ArExpr '-' ArExpr {$1 ++ $3 ++ "\tSUB\n"}
 | ArExpr '*' ArExpr {$1 ++ $3 ++ "\tMUL\n"}
 | ArExpr '/' ArExpr {$1 ++ $3 ++ "\tDIV\n"}
+| '-' ArExpr {"\tPUSH\t0\n\tPUSH\t1\n\tSUB\n" ++ $2 ++ "\tMUL\n"}
+| ArExpr mod ArExpr {$1 ++ $3 ++ $1 ++ $3 ++ "\tDIV\n" ++ "\tMUL\n" ++ "\tSUB\n"}
 | input '(' ')' {"\tIN\n"}
 
 LInit : Init ',' var {$1 ++ $3 ++ "\tDS\t" ++ "1\n"}
@@ -89,12 +92,6 @@ While : while Expr Linst endwhile {% while_do $2 $3}
 {
 
 data Etat = Etat {counter :: Integer} deriving (Eq, Show)
-
-{-
- Un type "stupide" -- ParseResult String est un synonyme de String.
-    On a envie de remplacer "ParseResult a" par "a" directement,
-    mais nous l'étendrons par la suite (questions 12 et suivantes)
--}
 
 type ParseResult a = State Etat a
 

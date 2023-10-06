@@ -32,6 +32,7 @@ tokens :-
   <0> endwhile {\p _ -> TK p EWH}
   <0> true {\p _ -> TK p TRUE}
   <0> false {\p _ -> TK p FALSE}
+  <0> mod {\p _ -> TK p MOD}
   <0> [a-zA-Z\_\$][a-zA-Z0-9\_\$]* {\p s -> TK p (VAR s)}
 
 {
@@ -60,6 +61,7 @@ data TokenName
   | EWH
   | TRUE
   | FALSE
+  | MOD
   deriving (Eq,Show)
 
 data Token = TK AlexPosn TokenName deriving (Eq,Show)

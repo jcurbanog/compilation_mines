@@ -26,6 +26,7 @@ import PascaLex
   '(' {TK _ LPAR}
   ')' {TK _ RPAR}
   '<' {TK _ SM}
+  '>' {TK _ GR}
   mod {TK _ MOD}
   and {TK _ AND}
   or {TK _ OR}
@@ -71,6 +72,12 @@ BoolExpr : true {"\tPUSH\t" ++ "1" ++ "\n"}
 | BoolExpr and BoolExpr {$1 ++ $3 ++ "\tAND\n"}
 | BoolExpr or BoolExpr {$1 ++ $3 ++ "\tOR\n"}
 | ArExpr '<' ArExpr {% smaller_than $1 $3}
+| ArExpr '>' ArExpr {% smaller_than $3 $1}
+| ArExpr '=' '=' ArExpr {% equal $1 $4}
+| ArExpr not '=' ArExpr {% not_equal $1 $4}
+| ArExpr '>' '=' ArExpr {% gre_or_eq $1 $4}
+| ArExpr '<' '=' ArExpr {% sma_or_eq $1 $4}
+| not BoolExpr {% PascalParser.not $2}
 
 ArExpr: integer {"\tPUSH\t" ++ (show $1) ++ "\n"}
 | var {"\tPUSH\t" ++ $1 ++ "\n" ++ "\tLOAD\n"}
@@ -155,6 +162,34 @@ smaller_than a b = do
     smaller_name ++ "\tEQU\t*\n" ++
     "\tPUSH\t1\n" ++
     endsmaller_name ++ "\tEQU\t*\n")
+
+gre_or_eq :: String -> String -> ParseResult String
+gre_or_eq a b = do
+  s <- smaller_than a b
+  answer <- PascalParser.not s
+  return (answer)
+
+sma_or_eq :: String -> String -> ParseResult String
+sma_or_eq a b = do
+  s <- smaller_than b a
+  answer <- PascalParser.not s
+  return (answer)
+
+equal :: String -> String -> ParseResult String
+equal a b = do
+  e <- if_then_else (a ++ b ++ "\tSUB\n") "\tPUSH\t0\n" "\tPUSH\t1\n"
+  return e
+
+not_equal :: String -> String -> ParseResult String
+not_equal a b = do
+  e <- equal a b
+  ne <- PascalParser.not e
+  return ne
+
+not :: String -> ParseResult String
+not bool = do
+  s <- if_then_else bool "\tPUSH\t0\n" "\tPUSH\t1\n"
+  return s
 
 incrCounter :: Etat -> Etat
 incrCounter s = Etat {counter = (counter s) + 1}

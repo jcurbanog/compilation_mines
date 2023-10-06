@@ -1,7 +1,14 @@
 let x;
 print -1*3;
 x = input();
+print !x<5;
+print x>=5;
 print x<5;
+print x>5;
+print x==5;
+let y = input();
+print x != y;
+print x == y;
 if x
 print x;
 else

@@ -26,6 +26,7 @@ tokens :-
   <0> let {\p _ -> TK p LET}
   <0> input {\p _ -> TK p INP}
   <0> if {\p _ -> TK p IF}
+  <0> else {\p _ -> TK p ELSE}
   <0> endif {\p _ -> TK p EIF}
   <0> while {\p _ -> TK p WH}
   <0> endwhile {\p _ -> TK p EWH}
@@ -53,6 +54,7 @@ data TokenName
   | VAR String
   | INP
   | IF
+  | ELSE
   | EIF
   | WH
   | EWH

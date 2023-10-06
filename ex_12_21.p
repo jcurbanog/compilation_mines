@@ -9,6 +9,9 @@ if 5-6
 print 1;
 print 424;
 endif
+if 3-2
+print 55555555555;
+endif
 print 2;
 let a,b,c;
 let cours = 20;

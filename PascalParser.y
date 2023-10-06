@@ -32,6 +32,7 @@ import PascaLex
   var {TK _ (VAR $$)}
   input {TK _ INP}
   if {TK _ IF}
+  else {TK _ ELSE}
   endif {TK _ EIF}
   while {TK _ WH}
   endwhile {TK _ EWH}
@@ -82,6 +83,7 @@ Init : let var {$2 ++ "\tDS\t" ++ "1\n"}
 Def : var '=' Expr {"\tPUSH\t" ++ $1 ++ "\n" ++ $3 ++ "\tSTORE\n"}
 InitDef : let var '=' Expr {$2 ++ "\tDS\t" ++ "1\n" ++ "\tPUSH\t" ++ $2 ++ "\n" ++ $4 ++ "\tSTORE\n"}
 If : if Expr Linst endif {% if_then $2 $3}
+-- IfElse : if Expr Linst else Linst endif {% }
 While : while Expr Linst endwhile {"debut\tEQU\t*\n" ++ $2 ++ "\tBEZ\t finwhile\n" ++ $3 ++ "\tPUSH\t debut\n\tGOTO\n" ++ "finwhile\tEQU\t*\n"}
 {
 

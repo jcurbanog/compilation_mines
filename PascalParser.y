@@ -55,6 +55,7 @@ Inst : Print ';' {$1}
   | Def ';' {$1}
   | InitDef ';' {$1}
   | If {$1}
+  | IfElse {$1}
   | While {$1}
 
 Print : print Expr {";/ print...\n" ++ $2 ++ "\tOUT\n"}
@@ -83,7 +84,7 @@ Init : let var {$2 ++ "\tDS\t" ++ "1\n"}
 Def : var '=' Expr {"\tPUSH\t" ++ $1 ++ "\n" ++ $3 ++ "\tSTORE\n"}
 InitDef : let var '=' Expr {$2 ++ "\tDS\t" ++ "1\n" ++ "\tPUSH\t" ++ $2 ++ "\n" ++ $4 ++ "\tSTORE\n"}
 If : if Expr Linst endif {% if_then $2 $3}
--- IfElse : if Expr Linst else Linst endif {% }
+IfElse : if Expr Linst else Linst endif {% if_then_else $2 $3 $5}
 While : while Expr Linst endwhile {"debut\tEQU\t*\n" ++ $2 ++ "\tBEZ\t finwhile\n" ++ $3 ++ "\tPUSH\t debut\n\tGOTO\n" ++ "finwhile\tEQU\t*\n"}
 {
 
@@ -108,6 +109,21 @@ if_then cond linst = do
     cond ++
     "\tBEZ\t" ++ endif_name ++ "\n" ++
     linst ++
+    endif_name ++ "\tEQU\t*\n")
+
+if_then_else :: String -> String -> String -> ParseResult String
+if_then_else cond then_linst else_linst = do
+  s <- get
+  let else_name = "else" ++ show (counter s)
+  let endif_name = "endif" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return (
+    cond ++
+    "\tBEZ\t" ++ else_name ++ "\n" ++
+    then_linst ++
+    "\tPUSH\t" ++ endif_name ++ "\n\tGOTO\n" ++
+    else_name ++ "\tEQU\t*\n" ++ else_linst ++
     endif_name ++ "\tEQU\t*\n")
 
 incrCounter :: Etat -> Etat

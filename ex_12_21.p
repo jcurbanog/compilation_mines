@@ -1,10 +1,14 @@
 let x;
 x = input();
-print x+1;
-while x
+if x
+print x;
+else
+print 7233;
+endif
+/*while x
 x = x - 1;
 print x;
-endwhile
+endwhile*/
 if 5-6
 print 1;
 print 424;

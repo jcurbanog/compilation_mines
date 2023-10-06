@@ -25,6 +25,8 @@ import PascaLex
   '=' {TK _ EQU}
   '(' {TK _ LPAR}
   ')' {TK _ RPAR}
+  '[' {TK _ LBRK}
+  ']' {TK _ RBRK}
   '<' {TK _ SM}
   '>' {TK _ GR}
   mod {TK _ MOD}
@@ -41,6 +43,9 @@ import PascaLex
   endwhile {TK _ EWH}
   true {TK _ TRUE}
   false {TK _ FALSE}
+  exit {TK _ EXIT}
+  fn {TK _ FN}
+  endfn {TK _ EFN}
 
 %left '+'
 %left '-'
@@ -61,6 +66,9 @@ Inst : Print ';' {$1}
   | If {$1}
   | IfElse {$1}
   | While {$1}
+  | exit '(' integer ')' ';' {"\tPUSH\t" ++ (show $3) ++ "\n\tSTOP\n"}
+  | DecFn {$1}
+  | CallFn ';' {$1}
 
 Print : print Expr {";/ print...\n" ++ $2 ++ "\tOUT\n"}
 
@@ -99,6 +107,9 @@ InitDef : let var '=' Expr {$2 ++ "\tDS\t" ++ "1\n" ++ "\tPUSH\t" ++ $2 ++ "\n" 
 If : if Expr Linst endif {% if_then $2 $3}
 IfElse : if Expr Linst else Linst endif {% if_then_else $2 $3 $5}
 While : while Expr Linst endwhile {% while_do $2 $3}
+
+DecFn : fn var '(' ')' Linst endfn {% declare_fn $2 $5}
+CallFn : var '(' ')' {% call_fn $1}
 {
 
 data Etat = Etat {counter :: Integer} deriving (Eq, Show)
@@ -190,6 +201,29 @@ not :: String -> ParseResult String
 not bool = do
   s <- if_then_else bool "\tPUSH\t0\n" "\tPUSH\t1\n"
   return s
+
+declare_fn :: String -> String -> ParseResult String
+declare_fn fn_label linst = do
+  s <- get
+  let skip_function = "skipfn" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return(
+    "\tPUSH\t" ++ skip_function ++ "\n\tGOTO\n" ++
+    fn_label ++ "\tEQU\t*\n" ++
+    linst ++ "\tGOTO\n" ++
+    skip_function ++ "\tEQU\t*\n")
+
+call_fn :: String -> ParseResult String
+call_fn fn_label = do
+  s <- get
+  let return_label = "returnFunction" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return(
+    "\tPUSH\t" ++ return_label ++ "\n" ++
+    "\tPUSH\t" ++ fn_label ++ "\n\tGOTO\n" ++
+    return_label ++ "\tEQU\t*\n")
 
 incrCounter :: Etat -> Etat
 incrCounter s = Etat {counter = (counter s) + 1}

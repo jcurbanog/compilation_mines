@@ -36,6 +36,7 @@ let cours = 20;
 print cours;
 a = true;
 print 50;
+exit(3);
 print true && true;
 print true && false;
 print false && true;

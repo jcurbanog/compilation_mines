@@ -18,6 +18,8 @@ tokens :-
   <0> \= {\p _ -> TK p EQU}
   <0> \( {\p _ -> TK p LPAR}
   <0> \) {\p _ -> TK p RPAR}
+  <0> \[ {\p _ -> TK p LBRK}
+  <0> \] {\p _ -> TK p RBRK}
   <0> \< {\p _ -> TK p SM}
   <0> \> {\p _ -> TK p GR}
   <0> \&\& {\p _ -> TK p AND}
@@ -35,6 +37,10 @@ tokens :-
   <0> true {\p _ -> TK p TRUE}
   <0> false {\p _ -> TK p FALSE}
   <0> mod {\p _ -> TK p MOD}
+  <0> exit {\p _ -> TK p EXIT}
+  <0> fn {\p _ -> TK p FN}
+  <0> endfn {\p _ -> TK p EFN}
+  <0> return {\p _ -> TK p RET}
   <0> [a-zA-Z\_\$][a-zA-Z0-9\_\$]* {\p s -> TK p (VAR s)}
 
 {
@@ -50,6 +56,8 @@ data TokenName
   | EQU
   | LPAR
   | RPAR
+  | LBRK
+  | RBRK
   | SM
   | GR
   | AND
@@ -66,6 +74,10 @@ data TokenName
   | TRUE
   | FALSE
   | MOD
+  | EXIT
+  | FN
+  | EFN
+  | RET
   deriving (Eq,Show)
 
 data Token = TK AlexPosn TokenName deriving (Eq,Show)

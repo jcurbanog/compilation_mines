@@ -1,0 +1,10 @@
+Main
+.compile
+*.a
+*.i
+*.o
+*.ex
+*.hi
+*.obj
+*.asm
+*~

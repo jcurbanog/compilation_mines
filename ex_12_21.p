@@ -5,10 +5,15 @@ print x;
 else
 print 7233;
 endif
-/*while x
+while x
 x = x - 1;
 print x;
-endwhile*/
+endwhile
+x = 10;
+while x
+x = x - 1;
+print x;
+endwhile
 if 5-6
 print 1;
 print 424;

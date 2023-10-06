@@ -712,15 +712,14 @@ happyReduction_34 (_ `HappyStk`
 	 = happyThen ((( if_then_else happy_var_2 happy_var_3 happy_var_5))
 	) (\r -> happyReturn (HappyAbsSyn16 r))
 
-happyReduce_35 = happyReduce 4 17 happyReduction_35
+happyReduce_35 = happyMonadReduce 4 17 happyReduction_35
 happyReduction_35 (_ `HappyStk`
 	(HappyAbsSyn5  happy_var_3) `HappyStk`
 	(HappyAbsSyn8  happy_var_2) `HappyStk`
 	_ `HappyStk`
-	happyRest)
-	 = HappyAbsSyn17
-		 ("debut\tEQU\t*\n" ++ happy_var_2 ++ "\tBEZ\t finwhile\n" ++ happy_var_3 ++ "\tPUSH\t debut\n\tGOTO\n" ++ "finwhile\tEQU\t*\n"
-	) `HappyStk` happyRest
+	happyRest) tk
+	 = happyThen ((( while_do happy_var_2 happy_var_3))
+	) (\r -> happyReturn (HappyAbsSyn17 r))
 
 happyNewToken action sts stk [] =
 	action 42 42 notHappyAtAll (HappyState action) sts stk []
@@ -810,6 +809,21 @@ if_then_else cond then_linst else_linst = do
     "\tPUSH\t" ++ endif_name ++ "\n\tGOTO\n" ++
     else_name ++ "\tEQU\t*\n" ++ else_linst ++
     endif_name ++ "\tEQU\t*\n")
+
+while_do :: String -> String -> ParseResult String
+while_do cond linst = do
+  s <- get
+  let while_name = "while" ++ show (counter s)
+  let endwhile_name = "endwhile" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return (
+    while_name ++ "\tEQU\t*\n" ++
+    cond ++
+    "\tBEZ\t" ++ endwhile_name ++ "\n" ++
+    linst ++
+    "\tPUSH\t" ++ while_name ++ "\n\tGOTO\n" ++
+    endwhile_name ++ "\tEQU\t*\n")
 
 incrCounter :: Etat -> Etat
 incrCounter s = Etat {counter = (counter s) + 1}

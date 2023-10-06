@@ -85,7 +85,7 @@ Def : var '=' Expr {"\tPUSH\t" ++ $1 ++ "\n" ++ $3 ++ "\tSTORE\n"}
 InitDef : let var '=' Expr {$2 ++ "\tDS\t" ++ "1\n" ++ "\tPUSH\t" ++ $2 ++ "\n" ++ $4 ++ "\tSTORE\n"}
 If : if Expr Linst endif {% if_then $2 $3}
 IfElse : if Expr Linst else Linst endif {% if_then_else $2 $3 $5}
-While : while Expr Linst endwhile {"debut\tEQU\t*\n" ++ $2 ++ "\tBEZ\t finwhile\n" ++ $3 ++ "\tPUSH\t debut\n\tGOTO\n" ++ "finwhile\tEQU\t*\n"}
+While : while Expr Linst endwhile {% while_do $2 $3}
 {
 
 data Etat = Etat {counter :: Integer} deriving (Eq, Show)
@@ -125,6 +125,21 @@ if_then_else cond then_linst else_linst = do
     "\tPUSH\t" ++ endif_name ++ "\n\tGOTO\n" ++
     else_name ++ "\tEQU\t*\n" ++ else_linst ++
     endif_name ++ "\tEQU\t*\n")
+
+while_do :: String -> String -> ParseResult String
+while_do cond linst = do
+  s <- get
+  let while_name = "while" ++ show (counter s)
+  let endwhile_name = "endwhile" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return (
+    while_name ++ "\tEQU\t*\n" ++
+    cond ++
+    "\tBEZ\t" ++ endwhile_name ++ "\n" ++
+    linst ++
+    "\tPUSH\t" ++ while_name ++ "\n\tGOTO\n" ++
+    endwhile_name ++ "\tEQU\t*\n")
 
 incrCounter :: Etat -> Etat
 incrCounter s = Etat {counter = (counter s) + 1}

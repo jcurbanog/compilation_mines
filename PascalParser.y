@@ -46,6 +46,7 @@ import PascaLex
   exit {TK _ EXIT}
   fn {TK _ FN}
   endfn {TK _ EFN}
+  return {TK _ RET}
 
 %left '+'
 %left '-'
@@ -68,12 +69,14 @@ Inst : Print ';' {$1}
   | While {$1}
   | exit '(' integer ')' ';' {"\tPUSH\t" ++ (show $3) ++ "\n\tSTOP\n"}
   | DecFn {$1}
+  | DecFnRet {$1}
   | CallFn ';' {$1}
 
 Print : print Expr {";/ print...\n" ++ $2 ++ "\tOUT\n"}
 
 Expr : ArExpr {$1}
 | BoolExpr {$1}
+| CallFn {$1}
 
 BoolExpr : true {"\tPUSH\t" ++ "1" ++ "\n"}
 | false {"\tPUSH\t" ++ "0" ++ "\n"}
@@ -109,6 +112,7 @@ IfElse : if Expr Linst else Linst endif {% if_then_else $2 $3 $5}
 While : while Expr Linst endwhile {% while_do $2 $3}
 
 DecFn : fn var '(' ')' Linst endfn {% declare_fn $2 $5}
+DecFnRet : fn var '(' ')' Linst return Expr endfn {% declare_fn_ret $2 $5 $7}
 CallFn : var '(' ')' {% call_fn $1}
 {
 
@@ -212,6 +216,18 @@ declare_fn fn_label linst = do
     "\tPUSH\t" ++ skip_function ++ "\n\tGOTO\n" ++
     fn_label ++ "\tEQU\t*\n" ++
     linst ++ "\tGOTO\n" ++
+    skip_function ++ "\tEQU\t*\n")
+
+declare_fn_ret :: String -> String -> String -> ParseResult String
+declare_fn_ret fn_label linst ret_exp = do
+  s <- get
+  let skip_function = "skipfn" ++ show (counter s)
+  let s' = incrCounter s
+  put s'
+  return(
+    "\tPUSH\t" ++ skip_function ++ "\n\tGOTO\n" ++
+    fn_label ++ "\tEQU\t*\n" ++
+    linst ++ ret_exp ++ "\tSWAP\n\tGOTO\n" ++
     skip_function ++ "\tEQU\t*\n")
 
 call_fn :: String -> ParseResult String

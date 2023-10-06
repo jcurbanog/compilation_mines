@@ -43,6 +43,7 @@ import PascaLex
 %left '+'
 %left '-'
 %left '*' '/'
+%left mod
 %%
 Program : Linst {$1 ++ "\tSTOP\n"}
 
@@ -81,7 +82,7 @@ ArExpr: integer {"\tPUSH\t" ++ (show $1) ++ "\n"}
 | input '(' ')' {"\tIN\n"}
 
 LInit : Init ',' var {$1 ++ $3 ++ "\tDS\t" ++ "1\n"}
-| LInit ',' var  {$1 ++ $3 ++ "\tDS\t" ++ "1\n"}
+| LInit ',' var {$1 ++ $3 ++ "\tDS\t" ++ "1\n"}
 
 Init : let var {$2 ++ "\tDS\t" ++ "1\n"}
 Def : var '=' Expr {"\tPUSH\t" ++ $1 ++ "\n" ++ $3 ++ "\tSTORE\n"}

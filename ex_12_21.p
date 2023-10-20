@@ -1,6 +1,8 @@
 let x;
-print -1*3;
+print -1*3; // moins unitaire
 x = input();
+
+// comparaisons entières
 print !x<5;
 print x>=5;
 print x<5;
@@ -9,34 +11,26 @@ print x==5;
 let y = input();
 print x != y;
 print x == y;
+
 if x
 print x;
 else
 print 7233;
 endif
-/*while x
-x = x - 1;
-print x;
-endwhile*/
-x = 10;
+
 while x
+if x>0
 x = x - 1;
+else
+x = x + 1;
+endif
 print x;
 endwhile
-if 5-6
-print 1;
-print 424;
-endif
-if 3-2
-print 55555555555;
-endif
-print 2;
+
+print 55555;
 let a,b,c;
-let cours = 20;
-print cours;
 a = true;
-print 50;
-exit(3);
+b = false;
 print true && true;
 print true && false;
 print false && true;
@@ -45,3 +39,9 @@ print true || true;
 print true || false;
 print false || true;
 print false || false;
+
+// The folowing line gives an error since a and b are no longer booleans but integers.
+// Then, the && and || operators are not available.
+// print a && b;
+
+exit(3);
